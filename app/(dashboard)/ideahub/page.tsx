@@ -9,21 +9,8 @@ import { Label } from "@/components/ui/label";
 import { IdeaCard } from "@/components/idea-card";
 import { Card } from "@/components/ui/card";
 import { Plus, Search, Filter, Sparkles } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select";
+import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle,DialogTrigger,} from "@/components/ui/dialog";
 import { useToast } from "@/lib/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 

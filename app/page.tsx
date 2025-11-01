@@ -1,21 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Lightbulb,
-  Users,
-  BarChart3,
-  CheckSquare,
-  Trophy,
-  User,
-  Bell,
-  Settings,
-  ArrowRight,
-  Sparkles,
-  Brain,
-  Zap,
-  Shield,
-} from "lucide-react";
+import {Lightbulb,Users,BarChart3,CheckSquare,Trophy,User,Bell,Settings,ArrowRight,Sparkles,Brain,Zap,Shield,} from "lucide-react";
 import Image from "next/image";
 
 const modules = [
@@ -98,14 +84,7 @@ const features = [
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <div
-        className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-background"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(var(--background), 0.95), rgba(var(--background), 0.98)), url(/hero-background.png)`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-background" style={{backgroundImage: `linear-gradient(to bottom, rgba(var(--background), 0.95), rgba(var(--background), 0.98)), url(/hero-background.png)`,backgroundSize: "cover",backgroundPosition: "center",}}>
         <div className="max-w-7xl mx-auto px-6 py-28 md:py-40 relative">
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in">
@@ -143,10 +122,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-28">
           {features.map((feature, index) => (
-            <Card 
-              key={index} 
-              className="p-8 hover-elevate"
-            >
+            <Card key={index} className="p-8 hover-elevate">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-5 transition-transform hover:scale-105">
                 <feature.icon className="h-6 w-6 text-primary" />
               </div>
@@ -158,7 +134,7 @@ export default function Home() {
 
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-5">
-            8 Powerful Modules
+            {modules.length} Powerful Modules
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Comprehensive tools for every stage of the innovation lifecycle
@@ -168,10 +144,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {modules.map((module, index) => (
             <Link key={index} href={module.url}>
-              <Card 
-                className="p-6 h-full hover-elevate cursor-pointer group transition-all duration-300" 
-                data-testid={`card-module-${module.title.toLowerCase()}`}
-              >
+              <Card className="p-6 h-full hover-elevate cursor-pointer group transition-all duration-300" data-testid={`card-module-${module.title.toLowerCase()}`}>
                 <div className="flex flex-col h-full">
                   <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-muted mb-5 transition-transform group-hover:scale-105 ${module.color}`}>
                     <module.icon className="h-6 w-6" />
