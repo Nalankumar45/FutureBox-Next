@@ -307,12 +307,105 @@
   }
 
   /* Simplified hover/active states - avoiding complex selectors that conflict with Tailwind */
+  .hover-elevate {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   .hover-elevate:hover {
     filter: brightness(1.05);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
   }
 
   .active-elevate:active,
   .active-elevate-2:active {
     filter: brightness(0.95);
+    transform: translateY(0);
+  }
+
+  /* Smooth transitions for all interactive elements */
+  button, a, [role="button"] {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Fade in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .animate-slide-in-left {
+    animation: slideInLeft 0.4s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  /* Staggered animation delays for list items */
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+  .stagger-7 { animation-delay: 0.35s; }
+  .stagger-8 { animation-delay: 0.4s; }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Enhanced focus states */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Hide Next.js development indicator - more specific selectors */
+  #__next-build-watcher,
+  #__next-devtools-panel,
+  [data-next-dev-overlay],
+  [data-nextjs-dialog-overlay],
+  nextjs-portal,
+  button[data-nextjs-data-runtime-error-collapsed-action],
+  .__next-error-overlay,
+  div[style*="position: fixed"][style*="bottom: var(--nextra-navbar-height)"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
   }
 }

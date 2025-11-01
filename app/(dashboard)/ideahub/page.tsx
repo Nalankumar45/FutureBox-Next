@@ -71,25 +71,27 @@ export default function IdeaHub() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2" data-testid="text-page-title">IdeaHub</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-4xl font-bold mb-2" data-testid="text-page-title">
+              IdeaHub
+            </h1>
+            <p className="text-lg text-muted-foreground">
               Submit, manage, and collaborate on innovative ideas
             </p>
           </div>
-          <Button size="lg" data-testid="button-submit-idea">
+          <Button size="lg" className="shadow-md hover:shadow-lg transition-all duration-300" data-testid="button-submit-idea">
             <Plus className="h-5 w-5 mr-2" />
             Submit Idea
           </Button>
         </div>
 
-        <Card className="p-4 bg-primary/5 border-primary/20 mb-6">
-          <div className="flex items-start gap-3">
+        <Card className="p-6 bg-primary/5 border-primary/20 mb-8">
+          <div className="flex items-start gap-4">
             <Sparkles className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <p className="font-medium text-sm mb-1">AI Features Available</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="font-semibold text-base mb-2">AI Features Available</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 This module includes AI-powered title suggestions, duplicate detection using semantic
                 search, NLP auto-tagging, and automated idea enhancement.
               </p>
@@ -97,7 +99,7 @@ export default function IdeaHub() {
           </div>
         </Card>
 
-        <div className="flex gap-4 mb-6 flex-wrap">
+        <div className="flex gap-4 mb-8 flex-wrap">
           <div className="flex-1 min-w-[300px]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

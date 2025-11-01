@@ -73,10 +73,10 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-6">
+      <SidebarHeader className="p-6 border-b">
         <Link href="/" data-testid="link-home">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+          <div className="flex items-center gap-3 cursor-pointer group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:shadow-lg">
               <Sparkles className="h-6 w-6 text-primary-foreground" />
             </div>
             <div className="flex flex-col">

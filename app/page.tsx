@@ -106,32 +106,32 @@ export default function Home() {
           backgroundPosition: "center",
         }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-6 py-28 md:py-40 relative">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <Sparkles className="h-8 w-8 text-primary" />
-              <span className="text-sm font-medium text-primary uppercase tracking-wide">
+            <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in">
+              <Sparkles className="h-7 w-7 text-primary" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
                 AI-Powered Innovation Platform
               </span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6" data-testid="text-hero-title">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 animate-fade-in" data-testid="text-hero-title">
               Transform Ideas Into
               <br />
               <span className="text-primary">Innovation Reality</span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-3xl mx-auto animate-fade-in">
               FutureBox helps organizations manage, evaluate, and track innovative ideas
               collaboratively with AI-powered workflows, ML analytics, and intelligent automation.
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
+            <div className="flex gap-4 justify-center flex-wrap animate-fade-in">
               <Link href="/ideahub">
-                <Button size="lg" data-testid="button-get-started">
+                <Button size="lg" className="text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300" data-testid="button-get-started">
                   Get Started
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="/impact">
-                <Button variant="outline" size="lg" data-testid="button-view-demo">
+                <Button variant="outline" size="lg" className="text-base px-8 py-6 transition-all duration-300" data-testid="button-view-demo">
                   View Demo
                 </Button>
               </Link>
@@ -140,24 +140,27 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+      <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-28">
           {features.map((feature, index) => (
-            <Card key={index} className="p-6 hover-elevate">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
+            <Card 
+              key={index} 
+              className="p-8 hover-elevate"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-5 transition-transform hover:scale-105">
                 <feature.icon className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.description}</p>
+              <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+              <p className="text-base text-muted-foreground leading-relaxed">{feature.description}</p>
             </Card>
           ))}
         </div>
 
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold mb-5">
             8 Powerful Modules
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Comprehensive tools for every stage of the innovation lifecycle
           </p>
         </div>
@@ -165,15 +168,18 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {modules.map((module, index) => (
             <Link key={index} href={module.url}>
-              <Card className="p-6 h-full hover-elevate cursor-pointer" data-testid={`card-module-${module.title.toLowerCase()}`}>
+              <Card 
+                className="p-6 h-full hover-elevate cursor-pointer group transition-all duration-300" 
+                data-testid={`card-module-${module.title.toLowerCase()}`}
+              >
                 <div className="flex flex-col h-full">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-muted mb-4 ${module.color}`}>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-lg bg-muted mb-5 transition-transform group-hover:scale-105 ${module.color}`}>
                     <module.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{module.title}</h3>
-                  <p className="text-sm text-muted-foreground flex-1">{module.description}</p>
-                  <div className="flex items-center text-primary text-sm font-medium mt-4">
-                    Learn more <ArrowRight className="ml-1 h-4 w-4" />
+                  <h3 className="text-lg font-bold mb-3">{module.title}</h3>
+                  <p className="text-sm text-muted-foreground flex-1 leading-relaxed">{module.description}</p>
+                  <div className="flex items-center text-primary text-sm font-semibold mt-5">
+                    Learn more <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Card>
@@ -181,17 +187,18 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="mt-24 text-center">
-          <Card className="p-12 bg-gradient-to-br from-primary/5 to-background">
-            <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-4">Ready to Innovate?</h3>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+        <div className="mt-32 text-center">
+          <Card className="p-16 bg-primary/5 shadow-lg">
+            <Sparkles className="h-12 w-12 text-primary mx-auto mb-6" />
+            <h3 className="text-3xl md:text-4xl font-bold mb-5">Ready to Innovate?</h3>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
               Join leading organizations transforming their innovation process with AI-powered
               collaboration and intelligent workflows.
             </p>
             <Link href="/ideahub">
-              <Button size="lg" data-testid="button-start-innovating">
+              <Button size="lg" className="text-base px-10 py-6 shadow-lg hover:shadow-xl transition-all duration-300" data-testid="button-start-innovating">
                 Start Innovating Today
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </Card>

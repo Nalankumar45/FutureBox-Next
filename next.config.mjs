@@ -2,6 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  devIndicators: {
+    buildActivity: false,
+    appIsrStatus: false,
+    buildActivityPosition: 'bottom-right',
+  },
+  experimental: {
+    devIndicators: false,
+  },
   images: {
     domains: [],
   },

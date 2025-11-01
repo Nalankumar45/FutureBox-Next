@@ -68,13 +68,13 @@ export function IdeaCard({
   };
 
   return (
-    <Card className="p-6 hover-elevate" data-testid={`card-idea-${id}`}>
+    <Card className="p-6 hover-elevate transition-all duration-300 group" data-testid={`card-idea-${id}`}>
       <div className="flex gap-4">
         <div className="flex-1">
           <div className="flex items-start justify-between gap-4 mb-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-semibold" data-testid={`text-idea-title-${id}`}>
+                <h3 className="text-lg font-bold" data-testid={`text-idea-title-${id}`}>
                   {title}
                 </h3>
                 {scores && (
@@ -83,7 +83,7 @@ export function IdeaCard({
                   </div>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
                 {description}
               </p>
             </div>
@@ -92,7 +92,7 @@ export function IdeaCard({
             </Badge>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-5">
             <Badge variant="outline" data-testid={`badge-category-${id}`}>{category}</Badge>
             {tags.map((tag, index) => (
               <Badge key={index} variant="secondary" className="text-xs">
@@ -102,19 +102,19 @@ export function IdeaCard({
           </div>
 
           {scores && (
-            <div className="flex gap-4 mb-4 text-sm">
-              <div className="flex items-center gap-1">
+            <div className="flex gap-6 mb-5 text-sm">
+              <div className="flex items-center gap-1.5">
                 <BarChart className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Feasibility:</span>
-                <span className="font-medium">{scores.feasibility}/10</span>
+                <span className="font-semibold">{scores.feasibility}/10</span>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">Impact:</span>
-                <span className="font-medium">{scores.impact}/10</span>
+                <span className="font-semibold">{scores.impact}/10</span>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">Cost:</span>
-                <span className="font-medium">{scores.cost}/10</span>
+                <span className="font-semibold">{scores.cost}/10</span>
               </div>
             </div>
           )}
@@ -138,7 +138,11 @@ export function IdeaCard({
                 <ThumbsUp className={`h-4 w-4 mr-2 ${isUpvoted ? "fill-current" : ""}`} />
                 {currentUpvotes}
               </Button>
-              <Button variant="outline" size="sm" data-testid={`button-comments-${id}`}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                data-testid={`button-comments-${id}`}
+              >
                 <MessageSquare className="h-4 w-4 mr-2" />
                 {comments}
               </Button>
