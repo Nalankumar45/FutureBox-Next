@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { IdeaCard } from "@/components/idea-card";
-import { AIIndicator } from "@/components/ai-indicator";
 import { Card } from "@/components/ui/card";
 import { Plus, Search, Filter, Sparkles } from "lucide-react";
 import {
@@ -14,59 +16,82 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 
 export default function IdeaHub() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newIdea, setNewIdea] = useState({
+    title: "",
+    description: "",
+    category: "",
+    tags: "",
+    authorId: 1,
+  });
+  const { toast } = useToast();
 
-  const mockIdeas = [
-    {
-      id: "1",
-      title: "AI-Powered Customer Service Chatbot",
-      description: "Implement an intelligent chatbot that can handle common customer queries, reducing response time by 60% and improving customer satisfaction.",
-      author: { name: "Sarah Chen" },
-      category: "Technology",
-      tags: ["AI", "Customer Service", "Automation"],
-      upvotes: 42,
-      comments: 12,
-      status: "review",
-      scores: { feasibility: 8, impact: 9, cost: 7 },
+  const { data: ideas = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/ideas", { search: searchQuery, category: selectedCategory }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.append("search", searchQuery);
+      if (selectedCategory) params.append("category", selectedCategory);
+      const res = await fetch(`/api/ideas?${params}`);
+      if (!res.ok) throw new Error("Failed to fetch ideas");
+      return res.json();
     },
-    {
-      id: "2",
-      title: "Sustainable Packaging Initiative",
-      description: "Replace all plastic packaging with biodegradable alternatives to reduce environmental impact and appeal to eco-conscious consumers.",
-      author: { name: "Michael Rodriguez" },
-      category: "Sustainability",
-      tags: ["Environment", "Packaging", "ESG"],
-      upvotes: 38,
-      comments: 8,
-      status: "approved",
-      scores: { feasibility: 7, impact: 8, cost: 6 },
+  });
+
+  const { data: categories = [] } = useQuery<any[]>({
+    queryKey: ["/api/categories"],
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("POST", "/api/ideas", data);
     },
-    {
-      id: "3",
-      title: "Remote Work Wellness Program",
-      description: "Create a comprehensive wellness program for remote employees including virtual fitness classes, mental health support, and ergonomic equipment stipends.",
-      author: { name: "Emily Johnson" },
-      category: "HR & Culture",
-      tags: ["Wellness", "Remote Work", "Employee Benefits"],
-      upvotes: 35,
-      comments: 15,
-      status: "implementing",
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas"] });
+      setDialogOpen(false);
+      setNewIdea({
+        title: "",
+        description: "",
+        category: "",
+        tags: "",
+        authorId: 1,
+      });
+      toast({
+        title: "Success",
+        description: "Your idea has been submitted successfully!",
+      });
     },
-    {
-      id: "4",
-      title: "Data Analytics Dashboard Overhaul",
-      description: "Modernize our analytics dashboard with real-time data visualization, predictive insights, and customizable reporting for better decision-making.",
-      author: { name: "David Park" },
-      category: "Technology",
-      tags: ["Analytics", "Data", "Dashboard"],
-      upvotes: 29,
-      comments: 6,
-      status: "submitted",
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to submit idea. Please try again.",
+      });
     },
-  ];
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const tagsArray = newIdea.tags.split(",").map((tag) => tag.trim()).filter((tag) => tag);
+    submitMutation.mutate({
+      ...newIdea,
+      tags: tagsArray,
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -80,10 +105,92 @@ export default function IdeaHub() {
               Submit, manage, and collaborate on innovative ideas
             </p>
           </div>
-          <Button size="lg" className="shadow-md hover:shadow-lg transition-all duration-300" data-testid="button-submit-idea">
-            <Plus className="h-5 w-5 mr-2" />
-            Submit Idea
-          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                size="lg"
+                className="shadow-md hover:shadow-lg transition-all duration-300"
+                data-testid="button-submit-idea"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Submit Idea
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>Submit New Idea</DialogTitle>
+                <DialogDescription>
+                  Share your innovative idea with the team. Fill in the details below.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Title *</Label>
+                  <Input
+                    id="title"
+                    data-testid="input-idea-title"
+                    placeholder="Enter idea title..."
+                    value={newIdea.title}
+                    onChange={(e) => setNewIdea({ ...newIdea, title: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description">Description *</Label>
+                  <Textarea
+                    id="description"
+                    data-testid="input-idea-description"
+                    placeholder="Describe your idea in detail..."
+                    value={newIdea.description}
+                    onChange={(e) => setNewIdea({ ...newIdea, description: e.target.value })}
+                    rows={4}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="category">Category *</Label>
+                  <Select
+                    value={newIdea.category}
+                    onValueChange={(value) => setNewIdea({ ...newIdea, category: value })}
+                    required
+                  >
+                    <SelectTrigger data-testid="select-idea-category">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat: any) => (
+                        <SelectItem key={cat.id} value={cat.name}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Input
+                    id="tags"
+                    data-testid="input-idea-tags"
+                    placeholder="e.g. AI, Innovation, Cost Saving"
+                    value={newIdea.tags}
+                    onChange={(e) => setNewIdea({ ...newIdea, tags: e.target.value })}
+                  />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={submitMutation.isPending} data-testid="button-submit-idea-form">
+                    {submitMutation.isPending ? "Submitting..." : "Submit Idea"}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <Card className="p-6 bg-primary/5 border-primary/20 mb-8">
@@ -118,24 +225,29 @@ export default function IdeaHub() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="technology">Technology</SelectItem>
-              <SelectItem value="sustainability">Sustainability</SelectItem>
-              <SelectItem value="hr">HR & Culture</SelectItem>
-              <SelectItem value="operations">Operations</SelectItem>
+              {categories.map((cat: any) => (
+                <SelectItem key={cat.id} value={cat.name.toLowerCase()}>
+                  {cat.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" data-testid="button-filter">
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
-          </Button>
         </div>
       </div>
 
-      <div className="space-y-4">
-        {mockIdeas.map((idea) => (
-          <IdeaCard key={idea.id} {...idea} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-8 text-muted-foreground">Loading ideas...</div>
+      ) : ideas.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          No ideas found. Be the first to submit an idea!
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {ideas.map((idea: any) => (
+            <IdeaCard key={idea.id} {...idea} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

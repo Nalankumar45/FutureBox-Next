@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +15,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Settings,
   Users,
   Shield,
@@ -20,29 +30,114 @@ import {
   Sparkles,
   Plus,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 
 export default function AdminPolicy() {
-  const categories = [
-    "Technology",
-    "Sustainability",
-    "Operations",
-    "HR & Culture",
-    "Marketing",
-    "Finance",
-  ];
+  const { toast } = useToast();
+  const [categoryDialog, setCategoryDialog] = useState(false);
+  const [badgeDialog, setBadgeDialog] = useState(false);
+  const [userDialog, setUserDialog] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
 
-  const badgesList = [
-    { name: "Innovator", points: 100, color: "blue" },
-    { name: "Collaborator", points: 150, color: "purple" },
-    { name: "Impact Champion", points: 200, color: "yellow" },
-    { name: "Quick Win", points: 100, color: "green" },
-  ];
+  const [newCategory, setNewCategory] = useState({ name: "" });
+  const [newBadge, setNewBadge] = useState({ name: "", points: 0, color: "blue" });
+  const [editUser, setEditUser] = useState({ name: "", email: "", role: "", status: "" });
 
-  const users = [
-    { name: "Sarah Chen", email: "sarah@company.com", role: "Admin", status: "Active" },
-    { name: "Michael Rodriguez", email: "michael@company.com", role: "Manager", status: "Active" },
-    { name: "Emily Johnson", email: "emily@company.com", role: "Employee", status: "Active" },
-  ];
+  const { data: categories = [] } = useQuery<any[]>({
+    queryKey: ["/api/categories"],
+  });
+
+  const { data: badges = [] } = useQuery<any[]>({
+    queryKey: ["/api/badges"],
+  });
+
+  const { data: users = [] } = useQuery<any[]>({
+    queryKey: ["/api/users"],
+  });
+
+  const categoryMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (editingItem) {
+        return apiRequest("PATCH", `/api/categories/${editingItem.id}`, data);
+      }
+      return apiRequest("POST", "/api/categories", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
+      setCategoryDialog(false);
+      setEditingItem(null);
+      setNewCategory({ name: "" });
+      toast({ title: "Success", description: "Category saved successfully!" });
+    },
+    onError: () => {
+      toast({ variant: "destructive", title: "Error", description: "Failed to save category." });
+    },
+  });
+
+  const badgeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (editingItem) {
+        return apiRequest("PATCH", `/api/badges/${editingItem.id}`, data);
+      }
+      return apiRequest("POST", "/api/badges", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/badges"] });
+      setBadgeDialog(false);
+      setEditingItem(null);
+      setNewBadge({ name: "", points: 0, color: "blue" });
+      toast({ title: "Success", description: "Badge saved successfully!" });
+    },
+    onError: () => {
+      toast({ variant: "destructive", title: "Error", description: "Failed to save badge." });
+    },
+  });
+
+  const userMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest("PATCH", `/api/users/${editingItem.id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setUserDialog(false);
+      setEditingItem(null);
+      toast({ title: "Success", description: "User updated successfully!" });
+    },
+    onError: () => {
+      toast({ variant: "destructive", title: "Error", description: "Failed to update user." });
+    },
+  });
+
+  const handleAddCategory = () => {
+    setEditingItem(null);
+    setNewCategory({ name: "" });
+    setCategoryDialog(true);
+  };
+
+  const handleEditCategory = (category: any) => {
+    setEditingItem(category);
+    setNewCategory({ name: category.name });
+    setCategoryDialog(true);
+  };
+
+  const handleAddBadge = () => {
+    setEditingItem(null);
+    setNewBadge({ name: "", points: 0, color: "blue" });
+    setBadgeDialog(true);
+  };
+
+  const handleEditBadge = (badge: any) => {
+    setEditingItem(badge);
+    setNewBadge({ name: badge.name, points: badge.points, color: badge.color });
+    setBadgeDialog(true);
+  };
+
+  const handleEditUser = (user: any) => {
+    setEditingItem(user);
+    setEditUser({ name: user.name, email: user.email, role: user.role, status: user.status });
+    setUserDialog(true);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -74,7 +169,7 @@ export default function AdminPolicy() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Total Users</p>
-              <p className="text-2xl font-bold">156</p>
+              <p className="text-2xl font-bold">{users.length}</p>
             </div>
           </div>
         </Card>
@@ -98,7 +193,7 @@ export default function AdminPolicy() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Active Badges</p>
-              <p className="text-2xl font-bold">{badgesList.length}</p>
+              <p className="text-2xl font-bold">{badges.length}</p>
             </div>
           </div>
         </Card>
@@ -121,7 +216,7 @@ export default function AdminPolicy() {
           <div className="p-6 border-b">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Categories</h2>
-              <Button size="sm" data-testid="button-add-category">
+              <Button size="sm" onClick={handleAddCategory} data-testid="button-add-category">
                 <Plus className="h-4 w-4 mr-2" />
                 Add
               </Button>
@@ -129,13 +224,13 @@ export default function AdminPolicy() {
           </div>
           <div className="p-6">
             <div className="space-y-3">
-              {categories.map((category, index) => (
+              {categories.map((category: any) => (
                 <div
-                  key={index}
+                  key={category.id}
                   className="flex items-center justify-between p-3 border rounded-lg hover-elevate"
                 >
-                  <span className="font-medium">{category}</span>
-                  <Button variant="ghost" size="sm">
+                  <span className="font-medium">{category.name}</span>
+                  <Button variant="ghost" size="sm" onClick={() => handleEditCategory(category)} data-testid={`button-edit-category-${category.id}`}>
                     Edit
                   </Button>
                 </div>
@@ -148,7 +243,7 @@ export default function AdminPolicy() {
           <div className="p-6 border-b">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Badges & Points</h2>
-              <Button size="sm" data-testid="button-add-badge">
+              <Button size="sm" onClick={handleAddBadge} data-testid="button-add-badge">
                 <Plus className="h-4 w-4 mr-2" />
                 Add
               </Button>
@@ -156,9 +251,9 @@ export default function AdminPolicy() {
           </div>
           <div className="p-6">
             <div className="space-y-3">
-              {badgesList.map((badge, index) => (
+              {badges.map((badge: any) => (
                 <div
-                  key={index}
+                  key={badge.id}
                   className="flex items-center justify-between p-3 border rounded-lg hover-elevate"
                 >
                   <div>
@@ -167,7 +262,7 @@ export default function AdminPolicy() {
                       {badge.points} points
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => handleEditBadge(badge)} data-testid={`button-edit-badge-${badge.id}`}>
                     Edit
                   </Button>
                 </div>
@@ -193,8 +288,8 @@ export default function AdminPolicy() {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
-                <tr key={index} className="border-b last:border-b-0 hover-elevate">
+              {users.map((user: any) => (
+                <tr key={user.id} className="border-b last:border-b-0 hover-elevate">
                   <td className="p-4 font-medium">{user.name}</td>
                   <td className="p-4 text-muted-foreground">{user.email}</td>
                   <td className="p-4">
@@ -206,7 +301,7 @@ export default function AdminPolicy() {
                     </Badge>
                   </td>
                   <td className="p-4">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)} data-testid={`button-edit-user-${user.id}`}>
                       Edit
                     </Button>
                   </td>
@@ -216,6 +311,153 @@ export default function AdminPolicy() {
           </table>
         </div>
       </Card>
+
+      <Dialog open={categoryDialog} onOpenChange={setCategoryDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingItem ? "Edit Category" : "Add Category"}</DialogTitle>
+            <DialogDescription>
+              {editingItem ? "Update the category name." : "Create a new category for ideas."}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); categoryMutation.mutate(newCategory); }} className="space-y-4">
+            <div>
+              <Label htmlFor="category-name">Category Name *</Label>
+              <Input
+                id="category-name"
+                data-testid="input-category-name"
+                value={newCategory.name}
+                onChange={(e) => setNewCategory({ name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setCategoryDialog(false)}>Cancel</Button>
+              <Button type="submit" disabled={categoryMutation.isPending} data-testid="button-save-category">
+                {categoryMutation.isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={badgeDialog} onOpenChange={setBadgeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingItem ? "Edit Badge" : "Add Badge"}</DialogTitle>
+            <DialogDescription>
+              {editingItem ? "Update badge details." : "Create a new badge for recognition."}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); badgeMutation.mutate(newBadge); }} className="space-y-4">
+            <div>
+              <Label htmlFor="badge-name">Badge Name *</Label>
+              <Input
+                id="badge-name"
+                data-testid="input-badge-name"
+                value={newBadge.name}
+                onChange={(e) => setNewBadge({ ...newBadge, name: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="badge-points">Points *</Label>
+              <Input
+                id="badge-points"
+                type="number"
+                data-testid="input-badge-points"
+                value={newBadge.points}
+                onChange={(e) => setNewBadge({ ...newBadge, points: parseInt(e.target.value) || 0 })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="badge-color">Color *</Label>
+              <Select value={newBadge.color} onValueChange={(value) => setNewBadge({ ...newBadge, color: value })}>
+                <SelectTrigger data-testid="select-badge-color">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="blue">Blue</SelectItem>
+                  <SelectItem value="purple">Purple</SelectItem>
+                  <SelectItem value="green">Green</SelectItem>
+                  <SelectItem value="yellow">Yellow</SelectItem>
+                  <SelectItem value="red">Red</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setBadgeDialog(false)}>Cancel</Button>
+              <Button type="submit" disabled={badgeMutation.isPending} data-testid="button-save-badge">
+                {badgeMutation.isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={userDialog} onOpenChange={setUserDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>Update user information and permissions.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); userMutation.mutate(editUser); }} className="space-y-4">
+            <div>
+              <Label htmlFor="user-name">Name *</Label>
+              <Input
+                id="user-name"
+                data-testid="input-user-name"
+                value={editUser.name}
+                onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="user-email">Email *</Label>
+              <Input
+                id="user-email"
+                type="email"
+                data-testid="input-user-email"
+                value={editUser.email}
+                onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="user-role">Role *</Label>
+              <Select value={editUser.role} onValueChange={(value) => setEditUser({ ...editUser, role: value })}>
+                <SelectTrigger data-testid="select-user-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Admin">Admin</SelectItem>
+                  <SelectItem value="Manager">Manager</SelectItem>
+                  <SelectItem value="Employee">Employee</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="user-status">Status *</Label>
+              <Select value={editUser.status} onValueChange={(value) => setEditUser({ ...editUser, status: value })}>
+                <SelectTrigger data-testid="select-user-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setUserDialog(false)}>Cancel</Button>
+              <Button type="submit" disabled={userMutation.isPending} data-testid="button-save-user">
+                {userMutation.isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
