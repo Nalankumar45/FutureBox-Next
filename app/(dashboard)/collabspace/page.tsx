@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { IdeaCard } from "@/components/idea-card";
 import { ThumbsUp, MessageSquare, Send, Sparkles } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/lib/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
 export default function CollabSpace() {

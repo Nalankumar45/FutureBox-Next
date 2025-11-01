@@ -30,7 +30,7 @@ export const ideas = pgTable("ideas", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 500 }).notNull(),
   description: text("description").notNull(),
-  category: varchar("category", { length: 255 }).notNull(),
+  categoryId: integer("category_id").references(() => categories.id).notNull(),
   tags: text("tags").array().notNull().default([]),
   status: varchar("status", { length: 50 }).notNull().default("submitted"),
   upvotes: integer("upvotes").notNull().default(0),
@@ -72,6 +72,9 @@ export const insertIdeaSchema = createInsertSchema(ideas).omit({
   createdAt: true,
   updatedAt: true,
   upvotes: true,
+}).extend({
+  tags: z.array(z.string()).min(0),
+  categoryId: z.number().int().positive("Please select a category"),
 });
 
 export const insertCommentSchema = createInsertSchema(comments).omit({
